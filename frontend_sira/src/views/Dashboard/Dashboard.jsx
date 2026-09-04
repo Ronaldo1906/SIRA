@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const usuario = localStorage.getItem('usuario') || 'Usuario SIRA';
-  const iniciales = usuario.substring(0, 2).toUpperCase();
+  const idUsuario = localStorage.getItem('id_usuario') || 1;
+  const [datosPerfil, setDatosPerfil] = useState(null);
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/usuarios/${idUsuario}/perfil`)
+      .then((res) => res.json())
+      .then((data) => setDatosPerfil(data))
+      .catch((err) => console.error("Error al cargar datos del usuario:", err));
+  }, [idUsuario]);
+
+  // Construcción dinámica de nombre, iniciales y rol desde la base de datos
+  const nombreCompleto = datosPerfil
+    ? `${datosPerfil.nombres} ${datosPerfil.apellidos}`
+    : 'Cargando...';
+
+  const iniciales = datosPerfil
+    ? `${datosPerfil.nombres[0] || ''}${datosPerfil.apellidos[0] || ''}`.toUpperCase()
+    : '..';
+
+  const rolUsuario = datosPerfil ? datosPerfil.rol : 'Aprendiz';
 
   const handleLogout = () => {
     if (window.confirm('¿Seguro que quieres cerrar sesión?')) {
@@ -14,10 +32,10 @@ export default function Dashboard() {
   };
 
   const menuItems = [
-    { icon: '👤', title: 'Perfil', desc: 'Ver y editar tu información personal y contraseña' },
-    { icon: '📝', title: 'Actividades', desc: 'Revisa tareas, evaluaciones y fechas de entrega' },
-    { icon: '📚', title: 'Material Académico', desc: 'Descarga guías, videos y recursos de tus cursos' },
-    { icon: '📊', title: 'Reportes', desc: 'Consulta tus calificaciones y progreso académico' }
+    { icon: '👤', title: 'Perfil', desc: 'Ver y editar tu información personal y contraseña', path: '/perfil' },
+    { icon: '📝', title: 'Actividades', desc: 'Revisa tareas, evaluaciones y fechas de entrega', path: '/actividades' },
+    { icon: '📚', title: 'Material Académico', desc: 'Descarga guías, videos y recursos de tus cursos', path: '/material' },
+    { icon: '📊', title: 'Reportes', desc: 'Consulta tus calificaciones y progreso académico', path: '/reportes' }
   ];
 
   return (
@@ -26,7 +44,7 @@ export default function Dashboard() {
       <nav style={styles.navbar}>
         <h1 style={styles.logo}>🎓 Sistema Académico</h1>
         <div style={styles.userInfo}>
-          <span>{usuario}</span>
+          <span>{nombreCompleto}</span>
           <div style={styles.avatar}>{iniciales}</div>
           <button style={styles.btnLogout} onClick={handleLogout}>Salir</button>
         </div>
@@ -35,13 +53,17 @@ export default function Dashboard() {
       {/* Contenido Principal */}
       <div style={styles.container}>
         <div style={styles.welcome}>
-          <h2>Bienvenido, Aprendiz</h2>
+          <h2>Bienvenido, {rolUsuario}</h2>
           <p>Selecciona una opción para continuar</p>
         </div>
 
         <div style={styles.menuGrid}>
           {menuItems.map((item, index) => (
-            <div key={index} style={styles.card}>
+            <div 
+              key={index} 
+              style={styles.card} 
+              onClick={() => navigate(item.path)}
+            >
               <div style={styles.cardIcon}>{item.icon}</div>
               <h3 style={styles.cardTitle}>{item.title}</h3>
               <p style={styles.cardDesc}>{item.desc}</p>
@@ -63,7 +85,7 @@ const styles = {
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
+    justify: 'space-between',
     fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
   },
   navbar: {
@@ -95,7 +117,7 @@ const styles = {
     color: '#667eea',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    justify: 'center',
     fontWeight: 'bold',
     fontSize: '16px'
   },
@@ -140,7 +162,7 @@ const styles = {
     borderRadius: '20px',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
+    justify: 'center',
     fontSize: '35px'
   },
   cardTitle: {

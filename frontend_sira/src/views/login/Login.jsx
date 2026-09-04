@@ -20,10 +20,27 @@ export default function Login() {
     try {
       const data = await login(credentials);
 
-      // Guardar el token de sesión y el usuario devueltos por el backend
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('usuario', data.usuario || credentials.username);
+      // Limpia la sesión anterior antes de guardar los nuevos datos
+      localStorage.clear();
+
+      // Guardar únicamente la información real retornada por el servidor
+      if (data.token) localStorage.setItem('token', data.token);
       
+      const idUsuario = data.id_usuario || data.id;
+      if (idUsuario) {
+        localStorage.setItem('id_usuario', idUsuario);
+      }
+
+      const nombreCompleto = data.nombres && data.apellidos 
+        ? `${data.nombres} ${data.apellidos}`.trim() 
+        : data.usuario || credentials.username;
+
+      localStorage.setItem('usuario', nombreCompleto);
+
+      if (data.rol) {
+        localStorage.setItem('rol', data.rol);
+      }
+
       // Redirigir al panel principal
       navigate('/dashboard');
     } catch (err) {
