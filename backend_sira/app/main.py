@@ -49,7 +49,6 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     Verifica las credenciales del usuario (email y contraseña)
     y retorna la información básica junto con el rol.
     """
-    # Imprime en la consola de la terminal del servidor los datos recibidos
     print(f"--> Intento de Login | Usuario/Email: {credentials.username} | Contraseña: {credentials.password}")
 
     query = text("""
@@ -84,8 +83,6 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-
-
 # ==========================================
 # 1. USUARIOS
 # ==========================================
@@ -105,7 +102,6 @@ def crear_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db))
 def listar_usuarios(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return db.query(models.Usuario).offset(skip).limit(limit).all()
 
-# --- AQUÍ REEMPLAZAS ESTA FUNCIÓN ---
 @app.get("/usuarios/{id_usuario}", response_model=schemas.UsuarioResponse, tags=["Usuarios"])
 def obtener_usuario(id_usuario: int, db: Session = Depends(get_db)):
     query = text("""
@@ -155,6 +151,13 @@ def notificaciones_no_leidas(id_usuario: int, db: Session = Depends(get_db)):
 # ==========================================
 # 2. ACTIVIDADES
 # ==========================================
+
+# Endpoint para listar los títulos de las actividades (Consumido por MaterialAcademico.jsx)
+@app.get("/api/actividades", tags=["Actividades"])
+def obtener_actividades_para_select(db: Session = Depends(get_db)):
+    query = text("SELECT id_actividad, titulo FROM Actividad;")
+    actividades = db.execute(query).mappings().all()
+    return [{"id": row["id_actividad"], "titulo": row["titulo"]} for row in actividades]
 
 @app.post("/actividades", response_model=schemas.ActividadResponse, status_code=status.HTTP_201_CREATED, tags=["Actividades"])
 def crear_actividad(actividad: schemas.ActividadCreate, db: Session = Depends(get_db)):

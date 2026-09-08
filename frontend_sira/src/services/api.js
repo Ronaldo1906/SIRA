@@ -18,4 +18,15 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
+// Petición para obtener las actividades desde la BD
+export const getActividadesDB = async () => {
+  try {
+    const response = await API.get("/actividades");
+    return response.data;
+  } catch (error) {
+    console.error("Error cargando actividades desde la BD:", error);
+    return [];
+  }
+};
+
 export default API;
