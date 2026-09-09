@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/authService';
+import fondoSede from '../../assets/sede.jpg'; // Ruta a la imagen de la sede
 
 export default function Login() {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -23,7 +24,7 @@ export default function Login() {
       // Limpia la sesión anterior antes de guardar los nuevos datos
       localStorage.clear();
 
-      // Guardar únicamente la información real retornada por el servidor
+      // Guardar información retornada por el servidor
       if (data.token) localStorage.setItem('token', data.token);
       
       const idUsuario = data.id_usuario || data.id;
@@ -51,45 +52,48 @@ export default function Login() {
   };
 
   return (
-    <div style={styles.body}>
-      <div style={styles.card}>
-        <div style={styles.iconHeader}>🎓</div>
-        <h2 style={styles.title}>SIRA</h2>
-        <p style={styles.subtitle}>Ingresa tus credenciales para continuar</p>
-        
-        {errorMsg && <div style={styles.errorAlert}>{errorMsg}</div>}
+    <div style={{ ...styles.body, backgroundImage: `url(${fondoSede})` }}>
+      {/* Capa de contraste y desenfoque suave para enfocar el edificio de fondo */}
+      <div style={styles.overlay}>
+        <div style={styles.card}>
+          <div style={styles.iconHeader}>🎓</div>
+          <h2 style={styles.title}>SIRA</h2>
+          <p style={styles.subtitle}>Ingresa tus credenciales para continuar</p>
+          
+          {errorMsg && <div style={styles.errorAlert}>{errorMsg}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Usuario</label>
-            <input
-              type="text"
-              name="username"
-              style={styles.input}
-              placeholder="Ej. Aprendiz"
-              value={credentials.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Usuario</label>
+              <input
+                type="text"
+                name="username"
+                style={styles.input}
+                placeholder="Ej. Aprendiz"
+                value={credentials.username}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <div style={styles.inputGroup}>
-            <label style={styles.label}>Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              style={styles.input}
-              placeholder="••••••••"
-              value={credentials.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div style={styles.inputGroup}>
+              <label style={styles.label}>Contraseña</label>
+              <input
+                type="password"
+                name="password"
+                style={styles.input}
+                placeholder="••••••••"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <button type="submit" style={styles.button} disabled={loading}>
-            {loading ? 'Verificando...' : 'Ingresar'}
-          </button>
-        </form>
+            <button type="submit" style={styles.button} disabled={loading}>
+              {loading ? 'Verificando...' : 'Ingresar'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
@@ -97,42 +101,63 @@ export default function Login() {
 
 const styles = {
   body: {
-    background: '#f5f7fa',
     minHeight: '100vh',
+    width: '100vw',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center 55%',
+    backgroundRepeat: 'no-repeat',
+    backgroundAttachment: 'fixed',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    overflow: 'hidden'
+  },
+  overlay: {
+    minHeight: '100vh',
+    width: '100%',
+    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    backdropFilter: 'blur(2px)',
+    WebkitBackdropFilter: 'blur(2px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
+    padding: '20px',
+    boxSizing: 'border-box'
   },
   card: {
-    background: 'white',
-    padding: '40px 30px',
-    borderRadius: '15px',
-    boxShadow: '0 5px 15px rgba(0,0,0,0.08)',
+    background: 'rgba(255, 255, 255, 0.93)',
+    padding: '40px 32px',
+    borderRadius: '20px',
+    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
     width: '100%',
-    maxWidth: '400px',
-    textAlign: 'center'
+    maxWidth: '380px',
+    textAlign: 'center',
+    border: '1px solid rgba(255, 255, 255, 0.6)',
+    // Garantiza que la tarjeta reciba clics de los inputs
+    position: 'relative',
+    zIndex: 5,
+    pointerEvents: 'auto'
   },
   iconHeader: {
-    width: '60px',
-    height: '60px',
+    width: '65px',
+    height: '65px',
     margin: '0 auto 15px',
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    borderRadius: '15px',
+    borderRadius: '18px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '30px'
+    fontSize: '32px',
+    boxShadow: '0 6px 15px rgba(102, 126, 234, 0.4)'
   },
   title: {
-    color: '#333',
-    fontSize: '24px',
+    color: '#1e293b',
+    fontSize: '26px',
+    fontWeight: '800',
     marginBottom: '5px'
   },
   subtitle: {
-    color: '#777',
+    color: '#64748b',
     fontSize: '14px',
-    marginBottom: '20px'
+    marginBottom: '25px'
   },
   errorAlert: {
     backgroundColor: '#ffe6e6',
@@ -140,7 +165,7 @@ const styles = {
     padding: '10px',
     borderRadius: '8px',
     fontSize: '13px',
-    marginBottom: '15px',
+    marginBottom: '18px',
     border: '1px solid #ffcccc'
   },
   inputGroup: {
@@ -150,29 +175,35 @@ const styles = {
   label: {
     display: 'block',
     fontSize: '14px',
-    color: '#555',
+    color: '#334155',
     marginBottom: '6px',
-    fontWeight: '500'
+    fontWeight: '600'
   },
   input: {
     width: '100%',
-    padding: '10px 14px',
-    borderRadius: '8px',
-    border: '1px solid #ddd',
+    padding: '11px 14px',
+    borderRadius: '10px',
+    border: '1px solid #cbd5e1',
     fontSize: '14px',
     outline: 'none',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    background: '#ffffff',
+    color: '#0f172a', // Asegura que el texto que escribes sea totalmente visible
+    position: 'relative',
+    zIndex: 10,
+    pointerEvents: 'auto'
   },
   button: {
     width: '100%',
-    padding: '12px',
+    padding: '13px',
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     border: 'none',
-    borderRadius: '8px',
+    borderRadius: '10px',
     color: 'white',
     fontSize: '16px',
     fontWeight: 'bold',
     cursor: 'pointer',
-    marginTop: '10px'
+    marginTop: '10px',
+    boxShadow: '0 8px 18px rgba(118, 75, 162, 0.35)'
   }
 };
