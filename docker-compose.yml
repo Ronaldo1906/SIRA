@@ -1,0 +1,30 @@
+﻿services:
+  backend:
+    build:
+      context: ./backend_sira
+      dockerfile: Dockerfile
+    container_name: sira-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend_sira/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./backend_sira:/app
+    restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend_sira
+      dockerfile: Dockerfile
+    container_name: sira-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend_sira:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://192.168.100.42:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
